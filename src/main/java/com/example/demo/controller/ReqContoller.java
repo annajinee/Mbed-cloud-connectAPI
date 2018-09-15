@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.model.Bumps;
 import com.example.demo.model.dao.BumpsRepo;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -122,7 +124,36 @@ public class ReqContoller {
                         String decodedString = new String(decodedBytes);
                         logger.info("decode : " + decodedString);
 
-                        
+                        String[] splitData = decodedString.split("id\":");
+                        String data = "{\"id\":"+splitData[1]+"id\":"+splitData[2];
+
+//                        logger.info("makeJsonData : " +data);
+
+
+                        JSONParser parser2 = new JSONParser();
+
+                        Object objGps = parser2.parse(String.valueOf(data));
+                        JSONObject jsonObjGps = (JSONObject) objGps;
+
+                        long time = System.currentTimeMillis();
+                        SimpleDateFormat dayTime = new SimpleDateFormat("yyyyMMdd HHmm");
+                        String regTim = dayTime.format(new Date(time));
+
+                        Bumps bumps = new Bumps();
+                        bumps.setLat(jsonObjGps.get("lat").toString());
+                        bumps.setLon(jsonObjGps.get("lon").toString());
+                        bumps.setVel(jsonObjGps.get("vel").toString());
+                        bumps.setAcc_x(jsonObjGps.get("acc_x").toString());
+                        bumps.setAcc_y(jsonObjGps.get("acc_y").toString());
+                        bumps.setAcc_z(jsonObjGps.get("acc_z").toString());
+                        bumps.setVehicle(jsonObjGps.get("vehicle").toString());
+                        bumps.setPlate(jsonObjGps.get("plate").toString());
+                        bumps.setType(jsonObjGps.get("type").toString());
+                        bumps.setCuid(jsonObjGps.get("cuid").toString());
+                        bumps.setDateAdded(regTim);
+                        bumpsRepo.save(bumps);
+                        logger.info("success to insert!");
+
                     }
 
 
