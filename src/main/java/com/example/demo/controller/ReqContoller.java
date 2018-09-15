@@ -80,7 +80,7 @@ public class ReqContoller {
         logger.info("/response_callback");
         logger.info(payload);
 
-        if(payload!=null) {
+        if (payload != null) {
 
             JSONParser parser = new JSONParser();
 
@@ -88,9 +88,9 @@ public class ReqContoller {
             JSONObject jsonObject = (JSONObject) obj;
             HashMap<String, Object> resourcesObj = (HashMap<String, Object>) obj;
 
-            List<HashMap> items = new ArrayList<HashMap>((Collection<? extends HashMap>) resourcesObj.get("notifications"));
+            if (resourcesObj != null && resourcesObj.get("notifications") != null) {
 
-            if(items.size()>0) {
+                List<HashMap> items = new ArrayList<HashMap>((Collection<? extends HashMap>) resourcesObj.get("notifications"));
 
                 for (int i = 0; i < items.size(); i++) {
 
@@ -130,7 +130,6 @@ public class ReqContoller {
 
 
                     }
-
                 }
             }
 
@@ -139,9 +138,6 @@ public class ReqContoller {
 
         return new ResponseEntity<>("", HttpStatus.OK);
     }
-
-
-
 
 
 }
