@@ -207,12 +207,72 @@ public class ReqContoller {
         JSONObject retObj = new JSONObject();
         JSONArray retArray = new JSONArray();
 
-
         for(int i=0; i<bumps.size(); i++){
-            retArray.add(bumps.get(i));
+
+            Bumps bum = bumps.get(i);
+
+            JSONObject dataObj = new JSONObject();
+            dataObj.put("lat", bum.getLat());
+            dataObj.put("lon", bum.getLon());
+            dataObj.put("vel", bum.getVel());
+            dataObj.put("acc_x", bum.getAcc_x());
+            dataObj.put("acc_y", bum.getAcc_y());
+            dataObj.put("acc_z", bum.getAcc_z());
+            dataObj.put("vehicle", bum.getVehicle());
+            dataObj.put("plate", bum.getPlate());
+            dataObj.put("type", bum.getType());
+            dataObj.put("cuid", bum.getCuid());
+            dataObj.put("dateAdded", bum.getDateAdded());
+            retArray.add(dataObj);
         }
         retObj.put("data",retArray);
 
         return retObj.toString();
     }
+
+    @RequestMapping(value = "/checkIfDanger", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(value = HttpStatus.OK)
+    public String checkIfDanger(@RequestBody(required = false) String payload) throws Exception {
+        logger.info("/checkIfDanger : " + payload);
+
+        JSONParser parser = new JSONParser();
+
+        Object obj = parser.parse(payload);
+        JSONObject jsonObject = (JSONObject) obj;
+        String fromDate = jsonObject.get("fromDate").toString()+" 0000";
+        String toDate = jsonObject.get("toDate").toString()+" 2359";
+
+        List<Bumps> bumps = bumpsRepo.findByDateAddedBetween(fromDate, toDate);
+        logger.info("result : "+bumps.toString());
+
+        JSONObject retObj = new JSONObject();
+        JSONArray retArray = new JSONArray();
+
+
+        for(int i=0; i<bumps.size(); i++){
+
+            Bumps bum = bumps.get(i);
+
+            JSONObject dataObj = new JSONObject();
+            dataObj.put("lat", bum.getLat());
+            dataObj.put("lon", bum.getLon());
+            dataObj.put("vel", bum.getVel());
+            dataObj.put("acc_x", bum.getAcc_x());
+            dataObj.put("acc_y", bum.getAcc_y());
+            dataObj.put("acc_z", bum.getAcc_z());
+            dataObj.put("vehicle", bum.getVehicle());
+            dataObj.put("plate", bum.getPlate());
+            dataObj.put("type", bum.getType());
+            dataObj.put("cuid", bum.getCuid());
+            dataObj.put("dateAdded", bum.getDateAdded());
+            retArray.add(dataObj);
+        }
+
+        retObj.put("data",retArray);
+
+        return retObj.toString();
+    }
+
+
 }
