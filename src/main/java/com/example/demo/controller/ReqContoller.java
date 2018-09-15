@@ -4,6 +4,7 @@ package com.example.demo.controller;
 import com.example.demo.model.Bumps;
 import com.example.demo.model.dao.BumpsRepo;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,9 +171,21 @@ public class ReqContoller {
     @ResponseStatus(value = HttpStatus.OK)
     public String selectAll() throws Exception {
         logger.info("/selectAll");
+        bumpsRepo.deleteByLatIsNull();
+
         List<Bumps> bumps = bumpsRepo.findAll();
         logger.info("result : " + bumps);
-        return bumps.toString();
+
+        JSONObject retObj = new JSONObject();
+        JSONArray retArray = new JSONArray();
+
+
+        for(int i=0; i<bumps.size(); i++){
+            retArray.add(bumps.get(i));
+        }
+        retObj.put("data",retArray);
+
+        return retObj.toJSONString();
     }
 
     @RequestMapping(value = "/selectByRegdate", method = RequestMethod.POST)
@@ -191,6 +204,15 @@ public class ReqContoller {
         List<Bumps> bumps = bumpsRepo.findByDateAddedBetween(fromDate, toDate);
         logger.info("result : "+bumps.toString());
 
-        return bumps.toString();
+        JSONObject retObj = new JSONObject();
+        JSONArray retArray = new JSONArray();
+
+
+        for(int i=0; i<bumps.size(); i++){
+            retArray.add(bumps.get(i));
+        }
+        retObj.put("data",retArray);
+
+        return retObj.toString();
     }
 }

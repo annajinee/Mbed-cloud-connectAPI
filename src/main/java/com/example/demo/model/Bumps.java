@@ -53,7 +53,7 @@ public class Bumps {
 
     @Override
     public String toString() {
-        return "Bumps{" +
+        return "{" +
                 "_id='" + _id + '\'' +
                 ", lat='" + lat + '\'' +
                 ", lon='" + lon + '\'' +

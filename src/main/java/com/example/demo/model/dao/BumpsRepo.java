@@ -11,4 +11,5 @@ public interface BumpsRepo extends MongoRepository<Bumps, String> {
 
     List<Bumps> findByDateAddedBetween(String fromDate, String toDate);
 
+    int deleteByLatIsNull();
 }
