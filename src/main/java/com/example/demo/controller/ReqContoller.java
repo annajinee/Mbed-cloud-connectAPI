@@ -20,6 +20,10 @@ public class ReqContoller {
 
     private String apiKey = "ak_1MDE2NTgxMDA3YjM1NTIwNzgwOWUwMzczMDAwMDAwMDA0165d6fbe5d1f6ad5e02b6d1000000002133LUNCESIgVa5g8NU7mcChGs4lEcSe";
 
+    private String deviceId = "0165dbd60e650000000000010010027d";
+    private String resourcePath = "/3303/0/5700";
+
+
     @RequestMapping(value = "/callback", method = RequestMethod.GET)
     @ResponseBody
     @ResponseStatus(value = HttpStatus.OK)
@@ -30,9 +34,8 @@ public class ReqContoller {
 
         try {
 
-
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("url", "http://13.125.248.55:5000");
+            jsonObject.put("url", "http://13.125.248.55:5000/response_callback");
 
 
             logger.info("req:" + jsonObject.toJSONString());
@@ -71,5 +74,37 @@ public class ReqContoller {
 
         return new ResponseEntity<>("", HttpStatus.OK);
     }
+
+
+    @RequestMapping(value = "/notification/callback", method = RequestMethod.GET)
+    @ResponseBody
+    @ResponseStatus(value = HttpStatus.OK)
+    public String subscriptions() throws Exception {
+        logger.info("/notification/callback");
+        JSONObject resObj = new JSONObject();
+        JSONParser parser = new JSONParser();
+
+        try {
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add("authorization", "Bearer " + apiKey);
+
+            ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.us-east-1.mbedcloud.com/v2/subscriptions/"+deviceId+"/"+resourcePath, HttpMethod.GET, new HttpEntity<byte[]>(headers), String.class);
+
+            JSONObject respObject = (JSONObject) parser.parse(responseEntity.getBody());
+
+            logger.info("Return : " + respObject.toJSONString());
+
+
+        } catch (Exception ex) {
+            resObj.put("errMsg", "Unknown Error");
+            logger.error(ex.toString());
+        }
+        return resObj.toJSONString();
+    }
+
+
 
 }
