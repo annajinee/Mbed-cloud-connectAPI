@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.model.Bumps;
 import com.example.demo.model.dao.BumpsRepo;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -15,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 /**
- * Created by annakim on 5/31/18.
+ * Created by annakim on 9/15/18.
  */
 @Controller
 public class ReqContoller {
@@ -28,8 +27,9 @@ public class ReqContoller {
 
     private String apiKey = "ak_1MDE2NTgxMDA3YjM1NTIwNzgwOWUwMzczMDAwMDAwMDA0165d6fbe5d1f6ad5e02b6d1000000002133LUNCESIgVa5g8NU7mcChGs4lEcSe";
 
-    private String deviceId = "0165dbd60e650000000000010010027d";
-    private String resourcePath = "/3303/0/5700";
+
+    private String resourcePath = "3303/0/5700";
+    private String resourcePath_gps = "3201/0/5853";
 
 
     @RequestMapping(value = "/callback", method = RequestMethod.GET)
@@ -97,40 +97,71 @@ public class ReqContoller {
                     String ep = (String) items.get(i).get("ep");
                     String path = (String) items.get(i).get("path");
                     String retpayload = (String) items.get(i).get("payload");
+                    logger.info("Return!!" + ep + ", " + path + ", " + retpayload);
 
                     if (path.equals("/3303/0/5700")) {
 
-                        logger.info("Return!!" + ep + ", " + path + ", " + retpayload);
-
                         byte[] decodedBytes = Base64.getDecoder().decode(retpayload);
                         String decodedString = new String(decodedBytes);
+                        logger.info("decode : " + decodedString);
 
+//                        RestTemplate restTemplate = new RestTemplate();
+//                        HttpHeaders headers = new HttpHeaders();
+//                        headers.setContentType(MediaType.APPLICATION_JSON);
+//                        headers.add("authorization", "Bearer " + apiKey);
 
-                        logger.info("decoded:" + decodedString);
-
-                        Bumps bumps = new Bumps();
-                        bumps.setAcc_x("1");
-                        bumps.setAcc_y("2");
-                        bumps.setAcc_z("3");
-                        bumpsRepo.save(bumps);
-
-
-                        logger.info("success to insert");
-
-                        logger.info(bumpsRepo.findAll().toString());
-
-//                RestTemplate restTemplate = new RestTemplate();
-//                HttpHeaders headers = new HttpHeaders();
-//                headers.setContentType(MediaType.APPLICATION_JSON);
-//                headers.add("authorization", "Bearer " + apiKey);
+//                        ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.us-east-1.mbedcloud.com/v2/subscriptions/" + ep + "/" + resourcePath, HttpMethod.PUT, new HttpEntity<byte[]>(headers), String.class);
 //
-//                ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.us-east-1.mbedcloud.com/v2/subscriptions/0165dbd60e650000000000010010027d/3303/0/5700", HttpMethod.PUT, new HttpEntity<byte[]>(headers), String.class);
-
-//        JSONObject respObject = (JSONObject) parser.parse(responseEntity.getBody());
+//                        logger.info("return : " + responseEntity.toString());
 
 
                     }
+
+                    if(path.equals("/3201/0/5853")){
+                        byte[] decodedBytes = Base64.getDecoder().decode(retpayload);
+                        String decodedString = new String(decodedBytes);
+                        logger.info("decode : " + decodedString);
+
+                        
+                    }
+
+
+//                    if (path.equals("/3201/0/5853")) {
+
+
+//                        logger.info("decoded:" + decodedString);
+//
+//                        Bumps bumps = new Bumps();
+//                        bumps.setAcc_x("1");
+//                        bumps.setAcc_y("2");
+//                        bumps.setAcc_z("3");
+//                        bumpsRepo.save(bumps);
+//
+//
+//                        logger.info("success to insert");
+//
+//                        logger.info(bumpsRepo.findAll().toString());
+
+//                    RestTemplate restTemplate = new RestTemplate();
+//                    HttpHeaders headers = new HttpHeaders();
+//                    headers.setContentType(MediaType.APPLICATION_JSON);
+//                    headers.add("authorization", "Bearer " + apiKey);
+//
+//                    ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.us-east-1.mbedcloud.com/v2/subscriptions/" + ep + "/" + resourcePath_gps, HttpMethod.PUT, new HttpEntity<byte[]>(headers), String.class);
+//
+//                    if(responseEntity!=null) {
+//
+//                        JSONObject respObject = (JSONObject) parser.parse(responseEntity.getBody());
+//
+//                        logger.info("return : " + respObject.toJSONString());
+//
+//                        String asyncId = respObject.get("async-response-id").toString();
+//
+//                        logger.info("asyncID : " + asyncId);
+//                    }
+
                 }
+//                }
             }
 
         }
