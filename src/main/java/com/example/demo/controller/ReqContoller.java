@@ -71,39 +71,33 @@ public class ReqContoller {
 
         logger.info("/response_callback");
         logger.info(payload);
+        JSONParser parser = new JSONParser();
+
+//        Object obj = parser.parse(payload);
+//        JSONObject jsonObject = (JSONObject) obj;
+//        HashMap<String, Object> resourcesObj = (HashMap<String, Object>) jsonObject.get("notifications");
+//        String ep = resourcesObj.get("ep").toString();
+//        String path = resourcesObj.get("path").toString();
+//
+
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("authorization", "Bearer " + apiKey);
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.us-east-1.mbedcloud.com/v2/subscriptions/0165dbd60e650000000000010010027d/3303/0/5700", HttpMethod.PUT, new HttpEntity<byte[]>(headers), String.class);
+
+//        JSONObject respObject = (JSONObject) parser.parse(responseEntity.getBody());
+
+        logger.info("Return : " + responseEntity.toString());
+
+
 
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
 
-    @RequestMapping(value = "/notification/callback", method = RequestMethod.GET)
-    @ResponseBody
-    @ResponseStatus(value = HttpStatus.OK)
-    public String subscriptions() throws Exception {
-        logger.info("/notification/callback");
-        JSONObject resObj = new JSONObject();
-        JSONParser parser = new JSONParser();
-
-        try {
-
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.add("authorization", "Bearer " + apiKey);
-
-            ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.us-east-1.mbedcloud.com/v2/subscriptions/"+deviceId+"/"+resourcePath, HttpMethod.GET, new HttpEntity<byte[]>(headers), String.class);
-
-            JSONObject respObject = (JSONObject) parser.parse(responseEntity.getBody());
-
-            logger.info("Return : " + respObject.toJSONString());
-
-
-        } catch (Exception ex) {
-            resObj.put("errMsg", "Unknown Error");
-            logger.error(ex.toString());
-        }
-        return resObj.toJSONString();
-    }
 
 
 
