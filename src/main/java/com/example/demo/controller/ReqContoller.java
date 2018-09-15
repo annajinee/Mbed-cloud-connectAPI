@@ -125,36 +125,35 @@ public class ReqContoller {
                         String decodedString = new String(decodedBytes);
                         logger.info("decode : " + decodedString);
 
-                        String[] splitData = decodedString.split("id\":");
-                        String data = "{\"id\":" + splitData[1] + "id\":" + splitData[2];
-
-//                        logger.info("makeJsonData : " +data);
-
 
                         JSONParser parser2 = new JSONParser();
 
-                        Object objGps = parser2.parse(String.valueOf(data));
+                        Object objGps = parser2.parse(String.valueOf(decodedString));
                         JSONObject jsonObjGps = (JSONObject) objGps;
 
                         long time = System.currentTimeMillis();
                         SimpleDateFormat dayTime = new SimpleDateFormat("yyyyMMdd HHmm");
                         String regTim = dayTime.format(new Date(time));
+                        String lon = "";
+                        try {
+                           lon = jsonObjGps.get("lon").toString();
+                            Bumps bumps = new Bumps();
+                            bumps.setLat(jsonObjGps.get("lat").toString());
+                            bumps.setLon(lon);
+                            bumps.setVel(jsonObjGps.get("vel").toString());
+                            bumps.setAcc_x(jsonObjGps.get("acc_x").toString());
+                            bumps.setAcc_y(jsonObjGps.get("acc_y").toString());
+                            bumps.setAcc_z(jsonObjGps.get("acc_z").toString());
+                            bumps.setVehicle(jsonObjGps.get("vehicle").toString());
+                            bumps.setPlate(jsonObjGps.get("plate").toString());
+                            bumps.setType(jsonObjGps.get("type").toString());
+                            bumps.setCuid(regTim);
+                            bumps.setDateAdded(regTim);
+                            bumpsRepo.save(bumps);
+                            logger.info("success to insert!");
 
-                        Bumps bumps = new Bumps();
-                        bumps.setLat(jsonObjGps.get("lat").toString());
-                        bumps.setLon(jsonObjGps.get("lon").toString());
-                        bumps.setVel(jsonObjGps.get("vel").toString());
-                        bumps.setAcc_x(jsonObjGps.get("acc_x").toString());
-                        bumps.setAcc_y(jsonObjGps.get("acc_y").toString());
-                        bumps.setAcc_z(jsonObjGps.get("acc_z").toString());
-                        bumps.setVehicle(jsonObjGps.get("vehicle").toString());
-                        bumps.setPlate(jsonObjGps.get("plate").toString());
-                        bumps.setType(jsonObjGps.get("type").toString());
-                        bumps.setCuid(jsonObjGps.get("cuid").toString());
-                        bumps.setDateAdded(regTim);
-                        bumpsRepo.save(bumps);
-                        logger.info("success to insert!");
-
+                        } catch (Exception ex) {
+                        }
                     }
 
                 }
@@ -236,42 +235,10 @@ public class ReqContoller {
     public String checkIfDanger(@RequestBody(required = false) String payload) throws Exception {
         logger.info("/checkIfDanger : " + payload);
 
-        JSONParser parser = new JSONParser();
-
-        Object obj = parser.parse(payload);
-        JSONObject jsonObject = (JSONObject) obj;
-        String fromDate = jsonObject.get("fromDate").toString()+" 0000";
-        String toDate = jsonObject.get("toDate").toString()+" 2359";
-
-        List<Bumps> bumps = bumpsRepo.findByDateAddedBetween(fromDate, toDate);
-        logger.info("result : "+bumps.toString());
-
-        JSONObject retObj = new JSONObject();
-        JSONArray retArray = new JSONArray();
+        List<Bumps> bumps = bumpsRepo.findLocation();
 
 
-        for(int i=0; i<bumps.size(); i++){
-
-            Bumps bum = bumps.get(i);
-
-            JSONObject dataObj = new JSONObject();
-            dataObj.put("lat", bum.getLat());
-            dataObj.put("lon", bum.getLon());
-            dataObj.put("vel", bum.getVel());
-            dataObj.put("acc_x", bum.getAcc_x());
-            dataObj.put("acc_y", bum.getAcc_y());
-            dataObj.put("acc_z", bum.getAcc_z());
-            dataObj.put("vehicle", bum.getVehicle());
-            dataObj.put("plate", bum.getPlate());
-            dataObj.put("type", bum.getType());
-            dataObj.put("cuid", bum.getCuid());
-            dataObj.put("dateAdded", bum.getDateAdded());
-            retArray.add(dataObj);
-        }
-
-        retObj.put("data",retArray);
-
-        return retObj.toString();
+        return bumps.toString();
     }
 
 
