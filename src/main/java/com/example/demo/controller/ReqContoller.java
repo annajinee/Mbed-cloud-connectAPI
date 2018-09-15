@@ -235,10 +235,31 @@ public class ReqContoller {
     public String checkIfDanger(@RequestBody(required = false) String payload) throws Exception {
         logger.info("/checkIfDanger : " + payload);
 
-        List<Bumps> bumps = bumpsRepo.findLocation();
+        JSONParser parser = new JSONParser();
 
+        Object obj = parser.parse(payload);
+        JSONObject jsonObject = (JSONObject) obj;
+        String lat = jsonObject.get("lat").toString();
+        String lon = jsonObject.get("lon").toString();
 
-        return bumps.toString();
+        List<Bumps> bumps = bumpsRepo.findByLatBetweenAndLonBetween(String.valueOf(Integer.parseInt(lat)-2),String.valueOf(Integer.parseInt(lat)+2), String.valueOf(Integer.parseInt(lon)-2), String.valueOf(Integer.parseInt(lat)+2));
+
+        JSONObject retObj = new JSONObject();
+        JSONArray retArray = new JSONArray();
+
+        if(bumps.size()>0){
+            for(int i=0; i<bumps.size(); i++){
+
+                Bumps bum = bumps.get(i);
+
+                JSONObject dataObj = new JSONObject();
+                dataObj.put("lat", bum.getLat());
+                dataObj.put("lon", bum.getLon());
+                retArray.add(dataObj);
+            }
+            retObj.put("data",retArray);
+        }
+        return retObj.toJSONString();
     }
 
 

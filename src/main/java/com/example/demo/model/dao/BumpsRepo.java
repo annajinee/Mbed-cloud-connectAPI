@@ -2,7 +2,6 @@ package com.example.demo.model.dao;
 
 import com.example.demo.model.Bumps;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 
@@ -14,6 +13,5 @@ public interface BumpsRepo extends MongoRepository<Bumps, String> {
 
     int deleteByLatIsNull();
 
-    @Query("{lat : ?0}")
-    List<Bumps> findLocation();
+    List<Bumps> findByLatBetweenAndLonBetween(String latFrom, String latTo, String lonFrom, String lonTo);
 }
