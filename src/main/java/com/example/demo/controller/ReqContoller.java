@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.*;
+
 /**
  * Created by annakim on 5/31/18.
  */
@@ -73,24 +75,44 @@ public class ReqContoller {
         logger.info(payload);
         JSONParser parser = new JSONParser();
 
-//        Object obj = parser.parse(payload);
-//        JSONObject jsonObject = (JSONObject) obj;
-//        HashMap<String, Object> resourcesObj = (HashMap<String, Object>) jsonObject.get("notifications");
-//        String ep = resourcesObj.get("ep").toString();
-//        String path = resourcesObj.get("path").toString();
+        Object obj = parser.parse(payload);
+        JSONObject jsonObject = (JSONObject) obj;
+        HashMap<String, Object> resourcesObj = (HashMap<String, Object>) obj;
+
+
+       List<HashMap> items = new ArrayList<HashMap>((Collection<? extends HashMap>) resourcesObj.get("notifications"));
+
+        for (int i = 0; i < items.size(); i++) {
+
+            String ep = (String) items.get(i).get("ep");
+            String path = (String) items.get(i).get("path");
+            String retpayload = (String) items.get(i).get("payload");
+
+            if(path.equals("/3303/0/5700")){
+
+                logger.info("Return!!"+ep +", "+path + ", "+retpayload);
+
+                byte[] decodedBytes = Base64.getDecoder().decode(retpayload);
+                String decodedString = new String(decodedBytes);
+
+
+                logger.info("decoded:"+decodedString);
+
+
+//                RestTemplate restTemplate = new RestTemplate();
+//                HttpHeaders headers = new HttpHeaders();
+//                headers.setContentType(MediaType.APPLICATION_JSON);
+//                headers.add("authorization", "Bearer " + apiKey);
 //
-
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("authorization", "Bearer " + apiKey);
-
-        ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.us-east-1.mbedcloud.com/v2/subscriptions/0165dbd60e650000000000010010027d/3303/0/5700", HttpMethod.PUT, new HttpEntity<byte[]>(headers), String.class);
+//                ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.us-east-1.mbedcloud.com/v2/subscriptions/0165dbd60e650000000000010010027d/3303/0/5700", HttpMethod.PUT, new HttpEntity<byte[]>(headers), String.class);
 
 //        JSONObject respObject = (JSONObject) parser.parse(responseEntity.getBody());
 
-        logger.info("Return : " + responseEntity.toString());
+
+            }
+
+        }
+
 
 
 
