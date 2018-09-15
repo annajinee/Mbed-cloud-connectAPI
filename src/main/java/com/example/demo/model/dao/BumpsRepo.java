@@ -5,8 +5,10 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface BumpsRepo extends MongoRepository <Bumps, String> {
+public interface BumpsRepo extends MongoRepository<Bumps, String> {
 
-List<Bumps> findAll();
+    List<Bumps> findAll();
+
+    List<Bumps> findByDateAddedBetween(String fromDate, String toDate);
 
 }

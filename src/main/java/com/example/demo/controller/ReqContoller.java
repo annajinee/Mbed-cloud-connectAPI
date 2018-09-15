@@ -119,13 +119,13 @@ public class ReqContoller {
 
                     }
 
-                    if(path.equals("/3201/0/5853")){
+                    if (path.equals("/3201/0/5853")) {
                         byte[] decodedBytes = Base64.getDecoder().decode(retpayload);
                         String decodedString = new String(decodedBytes);
                         logger.info("decode : " + decodedString);
 
                         String[] splitData = decodedString.split("id\":");
-                        String data = "{\"id\":"+splitData[1]+"id\":"+splitData[2];
+                        String data = "{\"id\":" + splitData[1] + "id\":" + splitData[2];
 
 //                        logger.info("makeJsonData : " +data);
 
@@ -156,50 +156,41 @@ public class ReqContoller {
 
                     }
 
-
-//                    if (path.equals("/3201/0/5853")) {
-
-
-//                        logger.info("decoded:" + decodedString);
-//
-//                        Bumps bumps = new Bumps();
-//                        bumps.setAcc_x("1");
-//                        bumps.setAcc_y("2");
-//                        bumps.setAcc_z("3");
-//                        bumpsRepo.save(bumps);
-//
-//
-//                        logger.info("success to insert");
-//
-//                        logger.info(bumpsRepo.findAll().toString());
-
-//                    RestTemplate restTemplate = new RestTemplate();
-//                    HttpHeaders headers = new HttpHeaders();
-//                    headers.setContentType(MediaType.APPLICATION_JSON);
-//                    headers.add("authorization", "Bearer " + apiKey);
-//
-//                    ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.us-east-1.mbedcloud.com/v2/subscriptions/" + ep + "/" + resourcePath_gps, HttpMethod.PUT, new HttpEntity<byte[]>(headers), String.class);
-//
-//                    if(responseEntity!=null) {
-//
-//                        JSONObject respObject = (JSONObject) parser.parse(responseEntity.getBody());
-//
-//                        logger.info("return : " + respObject.toJSONString());
-//
-//                        String asyncId = respObject.get("async-response-id").toString();
-//
-//                        logger.info("asyncID : " + asyncId);
-//                    }
-
                 }
-//                }
             }
 
         }
-
 
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
 
+    @RequestMapping(value = "/selectAll", method = RequestMethod.GET)
+    @ResponseBody
+    @ResponseStatus(value = HttpStatus.OK)
+    public String selectAll() throws Exception {
+        logger.info("/selectAll");
+        List<Bumps> bumps = bumpsRepo.findAll();
+        logger.info("result : " + bumps);
+        return bumps.toString();
+    }
+
+    @RequestMapping(value = "/selectByRegdate", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(value = HttpStatus.OK)
+    public String selectByRegdate(@RequestBody(required = false) String payload) throws Exception {
+        logger.info("/selectByRegdate : " + payload);
+
+        JSONParser parser = new JSONParser();
+
+        Object obj = parser.parse(payload);
+        JSONObject jsonObject = (JSONObject) obj;
+        String fromDate = jsonObject.get("fromDate").toString()+" 0000";
+        String toDate = jsonObject.get("toDate").toString()+" 2359";
+
+        List<Bumps> bumps = bumpsRepo.findByDateAddedBetween(fromDate, toDate);
+        logger.info("result : "+bumps.toString());
+
+        return bumps.toString();
+    }
 }
