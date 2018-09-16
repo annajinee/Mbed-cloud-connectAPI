@@ -14,4 +14,7 @@ public interface BumpsRepo extends MongoRepository<Bumps, String> {
     int deleteByLatIsNull();
 
     List<Bumps> findByLatBetweenAndLonBetween(String latFrom, String latTo, String lonFrom, String lonTo);
+
+
+    List<Bumps> findByLonAndLatAndAcc_xAndAcc_yAndAcc_zAndCuid(String lon, String lat, String acc_x, String acc_y, String );
 }

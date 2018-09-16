@@ -2,12 +2,18 @@ package com.example.demo.controller;
 
 
 import com.example.demo.model.Bumps;
+import com.example.demo.model.LocationEntity;
 import com.example.demo.model.dao.BumpsRepo;
+import com.example.demo.model.dao.LocationRepository;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +32,8 @@ public class ReqContoller {
 
     @Autowired
     private BumpsRepo bumpsRepo;
-
+    @Autowired
+    private LocationRepository locationRepo;
 
     private String apiKey = "ak_1MDE2NTgxMDA3YjM1NTIwNzgwOWUwMzczMDAwMDAwMDA0165d6fbe5d1f6ad5e02b6d1000000002133LUNCESIgVa5g8NU7mcChGs4lEcSe";
 
@@ -149,6 +156,17 @@ public class ReqContoller {
                             bumps.setType(jsonObjGps.get("type").toString());
                             bumps.setCuid(regTim);
                             bumps.setDateAdded(regTim);
+
+
+                            List<LocationEntity> entities = new ArrayList<>();
+                                final GeoJsonPoint locationPoint = new GeoJsonPoint(
+                                        Double.valueOf(lon),
+                                        Double.valueOf(jsonObjGps.get("lat").toString()));
+
+                                entities.add(new LocationEntity("s", locationPoint));
+
+                           bumps.setLocationEntity(entities);
+
                             bumpsRepo.save(bumps);
                             logger.info("success to insert!");
 
@@ -170,7 +188,6 @@ public class ReqContoller {
     @ResponseStatus(value = HttpStatus.OK)
     public String selectAll() throws Exception {
         logger.info("/selectAll");
-        bumpsRepo.deleteByLatIsNull();
 
         List<Bumps> bumps = bumpsRepo.findAll();
         logger.info("result : " + bumps);
@@ -242,24 +259,28 @@ public class ReqContoller {
         String lat = jsonObject.get("lat").toString();
         String lon = jsonObject.get("lon").toString();
 
-        List<Bumps> bumps = bumpsRepo.findByLatBetweenAndLonBetween(String.valueOf(Integer.parseInt(lat)-2),String.valueOf(Integer.parseInt(lat)+2), String.valueOf(Integer.parseInt(lon)-2), String.valueOf(Integer.parseInt(lat)+2));
+//        List<Bumps> bumps = bumpsRepo.findByLatBetweenAndLonBetween(String.valueOf(Integer.parseInt(lat)-2),String.valueOf(Integer.parseInt(lat)+2), String.valueOf(Integer.parseInt(lon)-2), String.valueOf(Integer.parseInt(lat)+2));
+//
+//        JSONObject retObj = new JSONObject();
+//        JSONArray retArray = new JSONArray();
+//
+//        if(bumps.size()>0){
+//            for(int i=0; i<bumps.size(); i++){
+//
+//                Bumps bum = bumps.get(i);
+//
+//                JSONObject dataObj = new JSONObject();
+//                dataObj.put("lat", bum.getLat());
+//                dataObj.put("lon", bum.getLon());
+//                retArray.add(dataObj);
+//            }
+//            retObj.put("data",retArray);
+//        }
+//        return retObj.toJSONString();
+        return String.valueOf(this.locationRepo.findBySubjectAndLocationNear("s",
+                new Point(Double.valueOf(lon), Double.valueOf(lat)),
+                new Distance(5, Metrics.KILOMETERS)));
 
-        JSONObject retObj = new JSONObject();
-        JSONArray retArray = new JSONArray();
-
-        if(bumps.size()>0){
-            for(int i=0; i<bumps.size(); i++){
-
-                Bumps bum = bumps.get(i);
-
-                JSONObject dataObj = new JSONObject();
-                dataObj.put("lat", bum.getLat());
-                dataObj.put("lon", bum.getLon());
-                retArray.add(dataObj);
-            }
-            retObj.put("data",retArray);
-        }
-        return retObj.toJSONString();
     }
 
 

@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import java.util.*;
+
 /**
  * _id:
  * lat:
@@ -33,6 +35,7 @@ public class Bumps {
     private String type;
     private String cuid;
     private String dateAdded;
+    private List<LocationEntity> locationEntity;
 
     public Bumps() {
     }
@@ -50,6 +53,10 @@ public class Bumps {
         this.cuid = cuid;
         this.dateAdded = dateAdded;
     }
+
+
+
+
 
     @Override
     public String toString() {
@@ -155,5 +162,13 @@ public class Bumps {
 
     public void setDateAdded(String dateAdded) {
         this.dateAdded = dateAdded;
+    }
+
+    public List<LocationEntity> getLocationEntity() {
+        return locationEntity;
+    }
+
+    public void setLocationEntity(List<LocationEntity> locationEntity) {
+        this.locationEntity = locationEntity;
     }
 }
