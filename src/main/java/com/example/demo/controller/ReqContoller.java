@@ -36,8 +36,6 @@ public class ReqContoller {
     private LocationRepository locationRepo;
 
     private String apiKey = "apiKey";
-
-
     private String resourcePath = "path1";
     private String resourcePath_gps = "path2";
 
@@ -51,10 +49,8 @@ public class ReqContoller {
         JSONParser parser = new JSONParser();
 
         try {
-
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("url", "call-backURL");
-
 
             logger.info("req:" + jsonObject.toJSONString());
             JSONObject respObject = new JSONObject();
@@ -64,16 +60,12 @@ public class ReqContoller {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("authorization", "Bearer " + apiKey);
 
-
             HttpEntity<String> entity;
 
             entity = new HttpEntity<String>(jsonObject.toString(), headers);
 
-            respObject = restTemplate.postForObject("requestURL", entity, JSONObject.class);
-
-
+            respObject = restTemplate.postForObject("https://api.us-east-1.mbedcloud.com/v2/notification/callback", entity, JSONObject.class);
             logger.info("Return : " + respObject.toJSONString());
-
 
         } catch (Exception ex) {
             resObj.put("errMsg", "Unknown Error");
@@ -110,18 +102,15 @@ public class ReqContoller {
                     logger.info("Return!!" + ep + ", " + path + ", " + retpayload);
 
                     if (path.equals(resourcePath)) {
-
                         byte[] decodedBytes = Base64.getDecoder().decode(retpayload);
                         String decodedString = new String(decodedBytes);
                         logger.info("decode : " + decodedString);
-
                     }
 
                     if (path.equals(resourcePath_gps)) {
                         byte[] decodedBytes = Base64.getDecoder().decode(retpayload);
                         String decodedString = new String(decodedBytes);
                         logger.info("decode : " + decodedString);
-
 
                         JSONParser parser2 = new JSONParser();
 
@@ -133,7 +122,7 @@ public class ReqContoller {
                         String regTim = dayTime.format(new Date(time));
                         String lon = "";
                         try {
-                           lon = jsonObjGps.get("lon").toString();
+                            lon = jsonObjGps.get("lon").toString();
                             Bumps bumps = new Bumps();
                             bumps.setLat(jsonObjGps.get("lat").toString());
                             bumps.setLon(lon);
@@ -147,16 +136,14 @@ public class ReqContoller {
                             bumps.setCuid(regTim);
                             bumps.setDateAdded(regTim);
 
-
                             List<LocationEntity> entities = new ArrayList<>();
-                                final GeoJsonPoint locationPoint = new GeoJsonPoint(
-                                        Double.valueOf(lon),
-                                        Double.valueOf(jsonObjGps.get("lat").toString()));
+                            final GeoJsonPoint locationPoint = new GeoJsonPoint(
+                                    Double.valueOf(lon),
+                                    Double.valueOf(jsonObjGps.get("lat").toString()));
 
-                                entities.add(new LocationEntity("s", locationPoint));
+                            entities.add(new LocationEntity("s", locationPoint));
 
-                           bumps.setLocationEntity(entities);
-
+                            bumps.setLocationEntity(entities);
                             bumpsRepo.save(bumps);
                             logger.info("success to insert!");
 
@@ -186,10 +173,10 @@ public class ReqContoller {
         JSONArray retArray = new JSONArray();
 
 
-        for(int i=0; i<bumps.size(); i++){
+        for (int i = 0; i < bumps.size(); i++) {
             retArray.add(bumps.get(i));
         }
-        retObj.put("data",retArray);
+        retObj.put("data", retArray);
 
         return retObj.toJSONString();
     }
@@ -204,16 +191,16 @@ public class ReqContoller {
 
         Object obj = parser.parse(payload);
         JSONObject jsonObject = (JSONObject) obj;
-        String fromDate = jsonObject.get("fromDate").toString()+" 0000";
-        String toDate = jsonObject.get("toDate").toString()+" 2359";
+        String fromDate = jsonObject.get("fromDate").toString() + " 0000";
+        String toDate = jsonObject.get("toDate").toString() + " 2359";
 
         List<Bumps> bumps = bumpsRepo.findByDateAddedBetween(fromDate, toDate);
-        logger.info("result : "+bumps.toString());
+        logger.info("result : " + bumps.toString());
 
         JSONObject retObj = new JSONObject();
         JSONArray retArray = new JSONArray();
 
-        for(int i=0; i<bumps.size(); i++){
+        for (int i = 0; i < bumps.size(); i++) {
 
             Bumps bum = bumps.get(i);
 
@@ -231,7 +218,7 @@ public class ReqContoller {
             dataObj.put("dateAdded", bum.getDateAdded());
             retArray.add(dataObj);
         }
-        retObj.put("data",retArray);
+        retObj.put("data", retArray);
 
         return retObj.toString();
     }
@@ -254,6 +241,5 @@ public class ReqContoller {
                 new Distance(5, Metrics.KILOMETERS)));
 
     }
-
 
 }
