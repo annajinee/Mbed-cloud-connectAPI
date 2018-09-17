@@ -1,6 +1,6 @@
 
 # Mbed-cloud-connectAPI
-Web applications to communicate with ArmMbed devices. 
+Web application to communicate with ArmMbed devices. 
 
  - Spring Boot /Java 
  - MongoDB - GeoJSON 
