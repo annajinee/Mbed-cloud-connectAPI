@@ -35,11 +35,11 @@ public class ReqContoller {
     @Autowired
     private LocationRepository locationRepo;
 
-    private String apiKey = "ak_1MDE2NTgxMDA3YjM1NTIwNzgwOWUwMzczMDAwMDAwMDA0165d6fbe5d1f6ad5e02b6d1000000002133LUNCESIgVa5g8NU7mcChGs4lEcSe";
+    private String apiKey = "apiKey";
 
 
-    private String resourcePath = "3303/0/5700";
-    private String resourcePath_gps = "3201/0/5853";
+    private String resourcePath = "path1";
+    private String resourcePath_gps = "path2";
 
 
     @RequestMapping(value = "/callback", method = RequestMethod.GET)
@@ -53,7 +53,7 @@ public class ReqContoller {
         try {
 
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("url", "http://13.125.248.55:5000/response_callback");
+            jsonObject.put("url", "call-backURL");
 
 
             logger.info("req:" + jsonObject.toJSONString());
@@ -69,7 +69,7 @@ public class ReqContoller {
 
             entity = new HttpEntity<String>(jsonObject.toString(), headers);
 
-            respObject = restTemplate.postForObject("https://api.us-east-1.mbedcloud.com/v2/notification/callback", entity, JSONObject.class);
+            respObject = restTemplate.postForObject("requestURL", entity, JSONObject.class);
 
 
             logger.info("Return : " + respObject.toJSONString());
@@ -109,25 +109,15 @@ public class ReqContoller {
                     String retpayload = (String) items.get(i).get("payload");
                     logger.info("Return!!" + ep + ", " + path + ", " + retpayload);
 
-                    if (path.equals("/3303/0/5700")) {
+                    if (path.equals(resourcePath)) {
 
                         byte[] decodedBytes = Base64.getDecoder().decode(retpayload);
                         String decodedString = new String(decodedBytes);
                         logger.info("decode : " + decodedString);
 
-//                        RestTemplate restTemplate = new RestTemplate();
-//                        HttpHeaders headers = new HttpHeaders();
-//                        headers.setContentType(MediaType.APPLICATION_JSON);
-//                        headers.add("authorization", "Bearer " + apiKey);
-
-//                        ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.us-east-1.mbedcloud.com/v2/subscriptions/" + ep + "/" + resourcePath, HttpMethod.PUT, new HttpEntity<byte[]>(headers), String.class);
-//
-//                        logger.info("return : " + responseEntity.toString());
-
-
                     }
 
-                    if (path.equals("/3201/0/5853")) {
+                    if (path.equals(resourcePath_gps)) {
                         byte[] decodedBytes = Base64.getDecoder().decode(retpayload);
                         String decodedString = new String(decodedBytes);
                         logger.info("decode : " + decodedString);
@@ -259,24 +249,6 @@ public class ReqContoller {
         String lat = jsonObject.get("lat").toString();
         String lon = jsonObject.get("lon").toString();
 
-//        List<Bumps> bumps = bumpsRepo.findByLatBetweenAndLonBetween(String.valueOf(Integer.parseInt(lat)-2),String.valueOf(Integer.parseInt(lat)+2), String.valueOf(Integer.parseInt(lon)-2), String.valueOf(Integer.parseInt(lat)+2));
-//
-//        JSONObject retObj = new JSONObject();
-//        JSONArray retArray = new JSONArray();
-//
-//        if(bumps.size()>0){
-//            for(int i=0; i<bumps.size(); i++){
-//
-//                Bumps bum = bumps.get(i);
-//
-//                JSONObject dataObj = new JSONObject();
-//                dataObj.put("lat", bum.getLat());
-//                dataObj.put("lon", bum.getLon());
-//                retArray.add(dataObj);
-//            }
-//            retObj.put("data",retArray);
-//        }
-//        return retObj.toJSONString();
         return String.valueOf(this.locationRepo.findBySubjectAndLocationNear("s",
                 new Point(Double.valueOf(lon), Double.valueOf(lat)),
                 new Distance(5, Metrics.KILOMETERS)));
